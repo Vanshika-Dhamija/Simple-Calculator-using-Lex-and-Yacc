@@ -1,0 +1,47 @@
+%token INTEGER VARIABLE
+%left '+' '-' '*' '/'
+%{
+#include<stdio.h>
+void yyerror(char *);
+int yylex(void);
+int sym[26];
+%}
+%%
+program:
+program statement '\n'
+|
+;
+statement:
+expr { printf("%d\n", $1); }
+| VARIABLE '=' expr { sym[$1] = $3; }
+;
+expr:
+INTEGER
+|VARIABLE { $$ = sym[$1]; }
+|add
+|sub
+|mul
+|div
+| '(' expr ')' { $$ = $2; }
+;
+add:
+expr '+' expr {  $$ = $1 + $3;}
+;
+sub:
+expr '-' expr {  $$ = $1 - $3;}
+;
+mul:
+expr '*' expr {  $$ = $1 * $3;  }
+;
+div:
+expr '/' expr { $$ = $1 / $3; }
+;
+%%
+void yyerror(char *s) {
+fprintf(stderr, "%s\n", s);
+}
+int main(void) {
+yyparse();
+return 0;
+}
+
